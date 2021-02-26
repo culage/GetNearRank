@@ -48,7 +48,10 @@ function Run-Main() {
 	# Œ‹‰Êo—Í
 	$outList = $maxPpList.Values | ? { $_.ppDiff -gt $PP_FILTER } | sort -desc ppDiff
 
-	$outList | ConvertTo-Csv > csv.txt
+	$csvText = $outList | ConvertTo-Csv
+	
+	$Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+	[System.IO.File]::WriteAllLines("csv.txt", $csvText, $Utf8NoBomEncoding)
 	
 $playlist =
 @"
@@ -64,7 +67,8 @@ $playlist =
 	$playlist = $playlist -replace "{date}", (date -format "yyyyMMdd")
 	$playlist = $playlist -replace "{song_id_list}", (($outList | %{ '{"hash":"' + $_.id + '"}' }) -join ",`n")
 	
-	$playlist > playlist.bplist
+	$Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+	[System.IO.File]::WriteAllLines("playlist.bplist", $playlist, $Utf8NoBomEncoding)
 }
 
 
